@@ -1,0 +1,10 @@
+Model,Mean Square Error,Root Mean Squared Error (RMSE),R-squared Error,Absolute Unsigned Error (AUE)
+Linear Regression,74726.03,273.36,0.66,211.95
+Ridge and Lasso,63714.25,253.36,0.692,190.95
+CNN+LSTM,29412.818,171.501,0.866,126.680
+LSTM,11505.86,107.27,0.95,78.90
+Convolutional NN,10207.586,101.033,0.953,72.42
+Deep NN,9855.840,99.276,0.955,68.213
+Gradient Boosting,9312.98,96.50,0.96,70.31
+K-Neighbour Regressor,8866.28,94.16,0.96,63.98
+Ada Boosting + KNN (Stacking),7592.055,86.13,0.976,55.23

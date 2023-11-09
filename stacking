@@ -1,0 +1,61 @@
+from sklearn.ensemble import StackingRegressor, GradientBoostingRegressor, RandomForestRegressor
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.svm import SVR
+from sklearn.linear_model import Ridge
+from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+import pandas as pd
+
+data = pd.read_csv('data/tobacco_database.csv')
+
+# Define features (X) and target (y)
+X = data[['void_fraction', 'surface_area_m2g', 'pld', 'lcd']]
+y = data['surface_area_m2cm3']
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Split the dataset
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Define base learners
+base_learners = [
+    ('knn', KNeighborsRegressor()),
+    ('gbr', GradientBoostingRegressor()),
+    ('svm', SVR()),
+    ('rf', RandomForestRegressor())
+]
+
+# Define meta-learner
+meta_learner = Ridge()
+
+# Create a pipeline with a scaler and the stacking model
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('stack', StackingRegressor(estimators=base_learners, final_estimator=meta_learner))
+])
+
+# Define parameter grid for hyperparameter tuning
+param_grid = {
+    'stack__knn__n_neighbors': [5, 10, 15],
+    'stack__gbr__n_estimators': [100, 200],
+    'stack__rf__n_estimators': [100, 200],
+    # Add more hyperparameters here
+}
+
+# Perform grid search
+grid = GridSearchCV(estimator=pipeline, param_grid=param_grid, cv=5, n_jobs=-1)
+grid.fit(X_train, y_train)
+
+# Get best parameters and score
+best_params = grid.best_params_
+best_score = grid.best_score_
+
+# Evaluate on test set
+pipeline.set_params(**best_params)
+pipeline.fit(X_train, y_train)
+test_score = pipeline.score(X_test, y_test)
+
+print(f'Best parameters: {best_params}')
+print(f'Validation score: {best_score}')
+print(f'Test score: {test_score}')
